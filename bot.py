@@ -1,18 +1,33 @@
-from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
+"""Minimal Telegram bot using aiogram 3.x.
+
+Reads BOT_TOKEN from the environment and responds with "Hi" to the
+``/start`` command.
+"""
+
+import asyncio
 import os
 
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+from aiogram import Bot, Dispatcher
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 if not BOT_TOKEN:
     raise RuntimeError("BOT_TOKEN env variable not set")
 
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher(bot)
+bot = Bot(BOT_TOKEN)
+dp = Dispatcher()
 
-@dp.message_handler(commands=['start'])
-async def start_handler(message: types.Message):
+
+@dp.message(CommandStart())
+async def start_handler(message: Message) -> None:
     await message.answer("Hi")
 
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+
+async def main() -> None:
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
